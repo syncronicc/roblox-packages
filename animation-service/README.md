@@ -1,130 +1,222 @@
-# AudioService
+# AnimationService
 
-A simple, flexible audio controller for Roblox games.
+A simple, flexible animation controller for Roblox games.
 
 ```lua
-local Audio = require(AudioService)
-local audio = Audio.new()
+local AnimationService = require(AnimationService)
+local anim = AnimationService.new(animator)
 ```
 
 ---
 
-## Methods
+## Setup
 
-### `service.new()`
-Creates a new AudioService instance.
+### `service.new(animator)`
+Creates a new AnimationService instance bound to an `Animator`.
 
 ```lua
-local audio = Audio.new()
+local anim = AnimationService.new(character.Humanoid.Animator)
 ```
 
 ---
 
-### `:play(options, use_service?)`
-Clones and plays a sound. Tracks it internally so you can stop it later. Returns the cloned `Sound`.
+## Playback
 
-Pass `use_service = true` to use `SoundService:PlayLocalSound` — returns `nil` in that case and does not track the sound.
+### `:play(id, speed?, events?)`
+Loads and plays an animation by asset id. If the animation is already playing it is stopped and restarted. Speed defaults to `1`.
 
 ```lua
-local bgm = audio:play({
-    SFX    = workspace.Music,
-    Looped = true,
-    Volume = 0.8,
-})
+anim:play(1234567890)
+anim:play(1234567890, 1.5)
 ```
 
 ---
 
-### `:play_once(options)`
-Clones and plays a sound exactly once, then destroys it automatically. Not tracked — fire and forget.
+### `:pause(id)`
+Pauses an animation by setting its speed to `0`. Preserves playback position.
 
 ```lua
-audio:play_once({
-    SFX    = sfxFolder.Explosion,
-    Volume = 1,
-})
+anim:pause(1234567890)
 ```
 
 ---
 
-### `:pause(sfx)`
-Pauses a playing sound. Preserves `TimePosition` so it can be resumed.
+### `:resume(id)`
+Resumes a paused animation at its original speed.
 
 ```lua
-audio:pause(bgm)
+anim:resume(1234567890)
 ```
 
 ---
 
-### `:resume(sfx)`
-Resumes a paused sound from where it left off.
+### `:stop(id)`
+Stops an animation and removes it from internal tracking.
 
 ```lua
-audio:resume(bgm)
+anim:stop(1234567890)
 ```
 
 ---
 
-### `:stop(sfx)`
-Destroys the sound and removes it from internal tracking.
+### `:adjust_speed(id, speed, mock?)`
+Changes the playback speed of a running animation. Pass `mock = true` to change the current speed without updating the default — useful for temporary slowdowns or pauses.
 
 ```lua
-audio:stop(bgm)
+anim:adjust_speed(1234567890, 0.5)
+anim:adjust_speed(1234567890, 0, true) -- temporary, default speed preserved
 ```
 
 ---
 
-### `:stop_all()`
-Destroys every tracked sound and clears `_tracks`. Useful on round end or scene transitions.
+## Groups
+
+Groups let you control multiple animations together under a single name.
+
+### `:create_group(name)`
+Creates a named group. Returns the `Group` object.
 
 ```lua
-audio:stop_all()
+local group = anim:create_group("combat")
+group:add(1234567890)
+group:add(9876543210)
 ```
 
 ---
 
-### `:is_playing(sfx)`
-Returns `true` if the sound is currently playing.
+### `:play_group(name)`
+Plays all animations in the group at the group's default speed.
 
 ```lua
-if audio:is_playing(bgm) then
-    print("music is running")
-end
+anim:play_group("combat")
 ```
 
 ---
 
-### `:is_paused(sfx)`
-Returns `true` if the sound is not playing but has a non-zero `TimePosition`.
+### `:pause_group(name)`
+Pauses all playing animations in the group.
 
 ```lua
-if audio:is_paused(bgm) then
-    audio:resume(bgm)
-end
+anim:pause_group("combat")
 ```
 
 ---
 
-### `:get_active_tracks()`
-Returns a shallow copy of all currently tracked sounds. Safe to iterate — mutations don't affect the internal list.
+### `:resume_group(name)`
+Resumes all paused animations in the group at the group's default speed.
 
 ```lua
-for _, track in audio:get_active_tracks() do
-    track.Volume = 0.2
-end
+anim:resume_group("combat")
 ```
 
 ---
 
-## PlayOptions
+### `:set_group_speed(name, speed, mock?)`
+Sets the speed of all animations in the group. Pass `mock = true` to change the current speed without updating the group's default speed.
 
-| Field | Type | Default | Description |
-|---|---|---|---|
-| `SFX` | `Sound` | required | Source sound to clone |
-| `Looped` | `boolean?` | `false` | Whether the sound loops |
-| `Volume` | `number?` | `0.5` | Playback volume |
-| `delay` | `number?` | `nil` | Seconds to wait before destroying after `.Ended` |
-| `Target` | `any?` | `nil` | Parent for the cloned sound (used server-side) |
+```lua
+anim:set_group_speed("combat", 2)
+anim:set_group_speed("combat", 0, true) -- temporary pause, default preserved
+```
+
+---
+
+### `:destroy_group(name)`
+Stops all animations in the group and removes the group.
+
+```lua
+anim:destroy_group("combat")
+```
+
+---
+
+## Group API
+
+The `Group` object returned by `:create_group()` has its own methods.
+
+### `group:add(id)`
+Adds an animation id to the group.
+
+```lua
+group:add(1234567890)
+```
+
+---
+
+### `group:remove(id)`
+Removes an animation id from the group.
+
+```lua
+group:remove(1234567890)
+```
+
+---
+
+### `group:get_state()`
+Returns `playing, paused` as two booleans.
+
+```lua
+local playing, paused = group:get_state()
+```
+
+---
+
+## Queries
+
+### `:is_playing(id, exclude_pause?)`
+Returns `true` if the animation is loaded. Pass `exclude_pause = true` to return `false` for animations that are paused (speed = 0).
+
+```lua
+anim:is_playing(1234567890)
+anim:is_playing(1234567890, true) -- false if paused
+```
+
+---
+
+### `:get_time(id)`
+Returns the current `TimePosition` of the animation. Returns `0` if not loaded.
+
+```lua
+local t = anim:get_time(1234567890)
+```
+
+---
+
+### `:get_lenght(id)`
+Returns the total length of the animation in seconds. Returns `0` if not loaded.
+
+```lua
+local len = anim:get_lenght(1234567890)
+```
+
+---
+
+### `:get_speed(id)`
+Returns the current playback speed. Returns `0` if not loaded.
+
+```lua
+local speed = anim:get_speed(1234567890)
+```
+
+---
+
+### `:get_weight(id)`
+Returns the current blend weight of the animation. Returns `0` if not loaded.
+
+```lua
+local weight = anim:get_weight(1234567890)
+```
+
+---
+
+## Cleanup
+
+### `:destroy()`
+Stops all animations and destroys all groups. Call when the service is no longer needed.
+
+```lua
+anim:destroy()
+```
 
 ---
 
