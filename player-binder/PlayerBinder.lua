@@ -2,7 +2,7 @@
 
 --------------------------------------------------------------------------------
 -- PlayerBinder.luau
--- A very useful module that helps the 
+-- A simple player binder that detects active players / newly added or removed players.
 --
 -- MIT License · Copyright (c) 2026 @kts
 --
