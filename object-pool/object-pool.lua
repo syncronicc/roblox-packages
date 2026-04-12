@@ -72,10 +72,12 @@ function service.new(object:BasePart,max_limit:number)
 	schedule(function()
 		for _=1,self.SizeLimit do
 			local clone=object:Clone()
-			clone.Parent=object.Parent
+			clone.Parent=object.Parent or workspace
 			clone.Position=FAR_POSITION
+			
 			insert(self._pool,clone)
 			insert(self._free,clone)
+			
 			self.Size+=1
 		end
 	end)
