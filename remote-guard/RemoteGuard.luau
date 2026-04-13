@@ -1,7 +1,7 @@
 --!strict
 --------------------------------------------------------------------------------
--- DataService.luau
--- A reuseable data controller
+-- RemoteGuard.luau
+-- A reuseable remote event/remote function guard.
 --
 -- MIT License · Copyright (c) 2026 @kts
 --------------------------------------------------------------------------------
