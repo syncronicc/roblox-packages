@@ -1,0 +1,11 @@
+{
+    "name": "Net-service",
+    "tree": {
+        "$className": "DataModel",
+        "ReplicatedStorage": {
+            "RemoteGuard": {
+                "$path": "src"
+            }
+        }
+    }
+}

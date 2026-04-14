@@ -1,0 +1,11 @@
+{
+    "name": "data-service",
+    "tree": {
+        "$className": "DataModel",
+        "ReplicatedStorage": {
+            "RemoteGuard": {
+                "$path": "src"
+            }
+        }
+    }
+}

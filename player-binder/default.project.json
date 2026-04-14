@@ -1,0 +1,11 @@
+{
+    "name": "player-binder",
+    "tree": {
+        "$className": "DataModel",
+        "ReplicatedStorage": {
+            "RemoteGuard": {
+                "$path": "src"
+            }
+        }
+    }
+}

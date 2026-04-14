@@ -1,0 +1,11 @@
+{
+    "name": "object-pool",
+    "tree": {
+        "$className": "DataModel",
+        "ReplicatedStorage": {
+            "RemoteGuard": {
+                "$path": "src"
+            }
+        }
+    }
+}

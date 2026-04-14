@@ -13,7 +13,7 @@ export type Connection={
 }
 
 --- Typed signal. `T...` is the tuple passed to every listener on `Fire`.
-export type Signal<T...>={
+export type Signal<T...> ={
 	Connect:(self:Signal<T...>,fn:(T...)->())->Connection,
 	Fire:(self:Signal<T...>,T...)->(),
 	DisconnectAll:(self:Signal<T...>)->(),

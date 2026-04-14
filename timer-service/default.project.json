@@ -1,0 +1,11 @@
+{
+    "name": "timer-service",
+    "tree": {
+        "$className": "DataModel",
+        "ReplicatedStorage": {
+            "RemoteGuard": {
+                "$path": "src"
+            }
+        }
+    }
+}
